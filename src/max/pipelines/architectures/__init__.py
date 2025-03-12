@@ -27,6 +27,7 @@ def register_all_models():
     from .pixtral import pixtral_arch
     from .qwen2 import qwen2_arch
     from .replit import replit_arch
+    from .mamba2 import mamba_arch
 
     architectures = [
         exaone_arch,
@@ -40,6 +41,7 @@ def register_all_models():
         qwen2_arch,
         replit_arch,
         granite_arch,
+        mamba_arch,
     ]
 
     for arch in architectures:
