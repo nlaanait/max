@@ -12,7 +12,7 @@
 # ===----------------------------------------------------------------------=== #
 
 from .layer_norm import LayerNorm, LayerNormV2
-from .rms_norm import DistributedRMSNorm, RMSNorm, RMSNormV2
+from .rms_norm import DistributedRMSNorm, RMSNorm, RMSNormV2, RMSNormGated
 
 __all__ = [
     "LayerNorm",
@@ -20,4 +20,5 @@ __all__ = [
     "RMSNorm",
     "RMSNormV2",
     "DistributedRMSNorm",
+    "RMSNormGated",
 ]

@@ -14,6 +14,7 @@
 """Normalization layer."""
 
 from dataclasses import dataclass
+from typing import Optional
 
 from max.dtype import DType
 from max.graph import (
@@ -85,3 +86,25 @@ class DistributedRMSNorm(RMSNormV2):
 
     def __call__(self, xs: list[TensorValue]) -> list[TensorValue]:  # type: ignore[override]
         return [self.rms_norms[i](xs[i]) for i in range(self.num_devices)]
+
+
+class RMSNormGated(Module):
+    def __init__(self, dim: int, eps: float = 1e-6):
+        super().__init__()
+        self.weight = Weight("weight", DType.float32, [dim])
+        self.eps = eps
+
+    def __call__(
+        self, h: TensorValue, gate: Optional[TensorValue] = None
+    ) -> TensorValue:
+        weight: TensorValue = ops.cast(self.weight, h.dtype)
+        if h.device:
+            weight = weight.to(h.device)
+        if gate is not None:
+            gate = ops.cast(gate, h.dtype)
+            if h.device:
+                gate = gate.to(h.device)
+            h = ops.mul(h, ops.silu(gate))
+        variance = ops.mean(ops.pow(h, 2), axis=-1)
+        h = ops.mul(h, ops.rsqrt(ops.add(variance, self.eps)))
+        return ops.mul(self.weight, h)
